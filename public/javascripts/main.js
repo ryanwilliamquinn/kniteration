@@ -17,6 +17,9 @@ window.onload = function(){
 
     // stitches are horizontal, rows are vertical
     function drawBoard(numStitches, numRows){
+        console.log("in draw board");
+        // this block is for resetting the canvas
+        canvas.width = canvas.width
         // if we want n number of horizontal boxes, we should have 
         var rowWidth = bw / numStitches;
         for (var x = 0; x <= bw; x += rowWidth) {
@@ -51,8 +54,9 @@ window.onload = function(){
     });
 
     $("#loadPattern").click(function(){
-        $json = $.getJSON(routes.loadPattern({id: $('#loadId').val()}), function(data) {
-            console.log(data);
+        console.log($('#patternSelect option:selected').val());
+        $json = $.getJSON(routes.loadPattern({name: $('#patternSelect option:selected').val()}), function(data) {
+            drawBoard(data.columns, data.rows);
         });
    }); 
 }

@@ -14,10 +14,11 @@ Welcome ${user.fullname} <a style="float:right; margin-right:50px;" href="@{Secu
 </div>
 
 #{if user && user.patterns}
-  Select a saved pattern: <select name="patternSelect">
+  Select a saved pattern: <select name="patternSelect" id="patternSelect">
   #{list user.patterns, as: 'pattern'}
     <option value="${pattern.name}">${pattern.name}</option> 
   #{/list}
   </select>
+  <button type="button" name="loadPattern" id="loadPattern">load pattern</button>
 #{/if}
 <canvas id="myCanvas" width="1000" height="1000" style="border:solid 1px black;"></canvas>

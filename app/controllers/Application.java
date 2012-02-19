@@ -21,10 +21,18 @@ public class Application extends Controller {
         render();
     }
 
-    public static void loadPattern(String id) {
-        User user = User.find("byEmail", "ryanwilliamquinn@gmail.com").first();
+    public static void loadPattern(String name) {
+        User user = (User) renderArgs.get("user");
         Set<Pattern> patterns = user.patterns;
-        renderJSON(patterns);
+        Pattern pattern = null;
+        for (Pattern p : patterns) {
+           System.out.println(p.name);
+           if (p.name.equals(name)) {
+               pattern = p;
+               break;
+           }
+       }
+       renderJSON(pattern);
     }
 
 }
