@@ -1,14 +1,15 @@
 package controllers;
-
+ 
 import play.*;
 import play.mvc.*;
-
+ 
 import java.util.*;
-
+ 
 import models.*;
-
-public class Application extends Controller {
-
+ 
+@With(Secure.class)
+public class Admin extends Controller {
+    
     @Before
     static void setConnectedUser() {
         if(Security.isConnected()) {
@@ -16,15 +17,15 @@ public class Application extends Controller {
             renderArgs.put("user", user);
         }
     }
-
+ 
     public static void index() {
-        render();
+      //User user = (User) renderArgs.get("user");
+      //Application.index(user);
+      Application.index();
     }
-
-    public static void loadPattern(String id) {
-        User user = User.find("byEmail", "ryanwilliamquinn@gmail.com").first();
-        Set<Pattern> patterns = user.patterns;
-        renderJSON(patterns);
+    
+    static void onDisconnected() {
+      Application.index();
     }
-
+    
 }

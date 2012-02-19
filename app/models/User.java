@@ -13,7 +13,7 @@ public class User extends Model {
     public String fullname;
     public boolean isAdmin;
 
-    @ManyToMany(cascade=CascadeType.PERSIST)
+    @OneToMany(cascade=CascadeType.PERSIST)
     public Set<Pattern> patterns;
 
     public User(String email, String password, String fullname) {
