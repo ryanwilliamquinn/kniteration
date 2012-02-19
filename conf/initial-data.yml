@@ -1,0 +1,23 @@
+# Test data
+
+User(lauren):
+    email:          lauren@gmail.com
+    password:       secret
+    fullname:       lauren girard 
+    isAdmin:        true
+    
+User(ryan):
+    email:          ryan@gmail.com
+    password:       secret
+    fullname:       ryan quinn 
+    
+Pattern(sweater):
+    name:           sweater
+    rows:           10
+    columns:        5
+
+Pattern(scarf):
+    name:           scarf
+    rows:           20
+    columns:        10
+
