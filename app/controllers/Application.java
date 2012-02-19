@@ -13,4 +13,11 @@ public class Application extends Controller {
         render();
     }
 
+    public static void loadPattern(String id) {
+        //renderJSON("{ryan: 'smart'}");
+        User user = User.find("byEmail", "ryanwilliamquinn@gmail.com").first();
+        Set<Pattern> patterns = user.patterns;
+        renderJSON(patterns);
+    }
+
 }

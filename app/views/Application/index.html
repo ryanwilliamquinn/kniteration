@@ -1,4 +1,13 @@
 #{extends 'main.html' /}
 #{set title:'Home' /}
 
-<h2>Welcome to kniterator</h2>
+<div class="initialization" id="init">
+    <input type="text" name="stitches" id="stitches"/>
+    <input type="text" name="rows" id="rows"/>
+    <button type="button" name="initialSubmit" id="initialSubmit">Create grid</button>
+</div>
+<div id="loadPattern">
+    <input type="text" name="loadId" id="loadId"/>
+    <button type="button" name="load" id="load">Load a pattern</button>
+</div>    
+<canvas id="myCanvas" width="1000" height="1000" style="border:solid 1px black;"></canvas>
