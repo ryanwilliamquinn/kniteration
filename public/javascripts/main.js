@@ -1,36 +1,43 @@
 window.onload = function(){
-    //grid width and height
-    var bw = 800;
-    var bh = 800;
+
     //padding around grid
     var p = 10;
-    //size of canvas
-    var cw = bw + (p*2) + 1;
-    var ch = bh + (p*2) + 1;
 
     var canvas = document.getElementById('myCanvas');
 
-    canvas.height = ch;
+    canvas.height = 1000;
     canvas.width = 1000;
 
     var context = canvas.getContext("2d");
 
     // stitches are horizontal, rows are vertical
     function drawBoard(numStitches, numRows){
-        console.log("in draw board");
         // this block is for resetting the canvas
         canvas.width = canvas.width
-        // if we want n number of horizontal boxes, we should have 
-        var rowWidth = bw / numStitches;
-        for (var x = 0; x <= bw; x += rowWidth) {
-            context.moveTo(0.5 + x + p, p);
-            context.lineTo(0.5 + x + p, bh + p);
+
+        // standard grid size
+        var rowWidth = 25;
+        var rowHeight = 25;
+
+        // if the standard grid size is bigger than the canvas, lets scale it...
+        var gridWidth = rowWidth * numStitches;
+        var gridHeight = rowHeight * numRows; 
+
+        console.log(gridWidth);
+        console.log(gridHeight);
+
+        if ((gridWidth > canvas.width) || (gridHeight > canvas.height)) {
+          context.scale(0.5, 0.5);
+        }
+  
+        for (var x = 0; x <= numStitches; x++) {
+            context.moveTo(0.5 + x * rowWidth + p, p);
+            context.lineTo(0.5 + x * rowWidth + p, (rowHeight * numRows) + p);
         }
 
-        var rowHeight = bh / numRows;
-        for (var x = 0; x <= bh; x += rowHeight) {
-            context.moveTo(p, 0.5 + x + p);
-            context.lineTo(bw + p, 0.5 + x + p);
+        for (var x = 0; x <= numRows; x++) {
+            context.moveTo(p, 0.5 + x * rowHeight + p);
+            context.lineTo(rowWidth * numStitches + p, 0.5 + x * rowHeight + p);
         }
 
         context.strokeStyle = "black";
@@ -47,9 +54,6 @@ window.onload = function(){
             else
         {
             drawBoard(stitches, rows);  
-            $.getJSON('http://127.0.0.1:1337?jsoncallback=?', function(data) {
-                console.log("hey");
-            });
         }
     });
 
@@ -59,4 +63,11 @@ window.onload = function(){
             drawBoard(data.columns, data.rows);
         });
    }); 
+
+   $("#increaseCellSize").click(function() {
+      var canvas = document.getElementById('myCanvas');
+
+      var context = canvas.getContext("2d");
+      context.scale(1.2, 1.2);
+    });
 }
