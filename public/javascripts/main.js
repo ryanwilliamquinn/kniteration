@@ -4,6 +4,8 @@ window.onload = function(){
     var p = 10;
 
     var canvas = document.getElementById('myCanvas');
+    var rows, stitches;
+    var scale = 1;
 
     canvas.height = 1000;
     canvas.width = 1000;
@@ -21,15 +23,21 @@ window.onload = function(){
 
         // if the standard grid size is bigger than the canvas, lets scale it...
         var gridWidth = rowWidth * numStitches;
-        var gridHeight = rowHeight * numRows; 
+        var gridHeight = rowHeight * numRows;
+        
+        console.log(scale);
 
-        console.log(gridWidth);
-        console.log(gridHeight);
-
-        if ((gridWidth > canvas.width) || (gridHeight > canvas.height)) {
-          context.scale(0.5, 0.5);
+        if (scale != 1) {
+            context.scale(scale, scale);
+        } 
+        /*
+        else {
+            if ((gridWidth > canvas.width) || (gridHeight > canvas.height)) {
+                context.scale(0.5, 0.5);
+            }
         }
-  
+        */
+
         for (var x = 0; x <= numStitches; x++) {
             context.moveTo(0.5 + x * rowWidth + p, p);
             context.lineTo(0.5 + x * rowWidth + p, (rowHeight * numRows) + p);
@@ -45,29 +53,30 @@ window.onload = function(){
     }
 
     $("#initialSubmit").click(function(){
-        var stitches = $('#stitches').val();
-        var rows = $('#rows').val();
-        if (stitches == undefined || rows == undefined)
-        {
+        stitches = $('#stitches').val();
+        rows = $('#rows').val();
+        if (stitches == undefined || rows == undefined) {
             alert("i need a number for both stitches and rows!");
-        }
-            else
-        {
+        } else {
             drawBoard(stitches, rows);  
         }
     });
 
     $("#loadPattern").click(function(){
-        console.log($('#patternSelect option:selected').val());
         $json = $.getJSON(routes.loadPattern({name: $('#patternSelect option:selected').val()}), function(data) {
+            rows = data.rows;
+            stitches = data.columns;
             drawBoard(data.columns, data.rows);
         });
-   }); 
+    }); 
 
-   $("#increaseCellSize").click(function() {
-      var canvas = document.getElementById('myCanvas');
+    $("#increaseCellSize").click(function() {
+        scale += .1;
+        drawBoard(stitches, rows);
+    });
 
-      var context = canvas.getContext("2d");
-      context.scale(1.2, 1.2);
+    $("#decreaseCellSize").click(function() {
+        scale -= .1;
+        drawBoard(stitches, rows);
     });
 }

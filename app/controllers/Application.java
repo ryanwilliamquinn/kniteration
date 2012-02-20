@@ -22,7 +22,7 @@ public class Application extends Controller {
     }
 
     public static void loadPattern(String name) {
-        User user = (User) renderArgs.get("user");
+        User user = Security.getCurrentUser();
         Set<Pattern> patterns = user.patterns;
         Pattern pattern = null;
         for (Pattern p : patterns) {
