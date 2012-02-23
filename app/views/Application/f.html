@@ -1,0 +1,218 @@
+<html>
+    <head>
+        <script src="all.js" type="text/javascript"></script>
+    </head>
+    <body>
+        <button onclick="duplicate();">Duplicate</button>
+        <div id="wrapper">
+            <canvas id="c" height="1000" width="1000"></canvas>
+        </div>
+        <script type="text/javascript">
+
+            var canvas = new fabric.Canvas('c');
+
+            var Cross = fabric.util.createClass(fabric.Object, {
+
+            initialize: function(options) {
+                this.callSuper('initialize', options);
+                this.animDirection = 'up';
+
+                this.width = 50;
+                this.height = 50;
+
+                this.w1 = this.h2 = 50;
+                this.h1 = this.w2 = 20;
+
+                this.type_name = "Cross";
+                this.lockScalingX = true;
+                this.lockScalingY = true;
+                this.hasControls = false;
+            },
+
+            animateWidthHeight: function() {
+            var interval = 2;
+
+            if (this.h2 >= 30 && this.h2 <= 100) {
+            var actualInterval = (this.animDirection === 'up' ? interval : -interval);
+            this.h2 += actualInterval;
+            this.w1 += actualInterval;
+            }
+
+            if (this.h2 >= 100) {
+                this.animDirection = 'down';
+                this.h2 -= interval;
+                this.w1 -= interval;
+            }
+            if (this.h2 <= 30) {
+                this.animDirection = 'up';
+                this.h2 += interval;
+                this.w1 += interval;
+            }
+            },
+
+
+            _render: function(ctx) {
+                         ctx.fillRect(-this.w1 / 2, -this.h1 / 2, this.w1, this.h1);
+                         ctx.fillRect(-this.w2 / 2, -this.h2 / 2, this.w2, this.h2);
+                     }
+            });
+
+            canvas.add(
+                new Cross({ top: 35.5, left: 35.5 }),
+                new Cross({ top: 35.5, left: 85.5 })
+            );
+
+            var rowWidth = 50;
+            var rowHeight = 50;
+            var numRows = 10;
+            var numStitches = 15;
+            var p = 10;
+            var xcoord = 0;
+            var ycoord = 0;
+            // snap points will be the center points of each square, which i will try to get the objects to snap their own center points to!
+            var snapPoints = [];
+            var initialX = p + (rowWidth * .5);
+            var initialY = p + (rowHeight * .5);
+            for (var x = 0; x < numStitches; x++) {
+              for (var y = 0; y < numRows; y++) {
+                snapPoints.push([(.5 + initialX + (rowWidth * x)), (.5 + initialY + (y * rowHeight))]);
+              }
+            }
+
+            for (var i = 0; i < snapPoints.length; i++) {
+              var x = snapPoints[i][0];
+              var y = snapPoints[i][1];
+              canvas.add(new fabric.Circle({left: x, top: y, fill: '#FFFFFF', radius: 0, selectable: false }));
+            }
+
+            for (var x = 0; x <= numStitches; x++) {
+                xcoord = .5 + (x * rowWidth) + p;
+                ycoord = p;
+                //ctx.moveTo(0.5 + x * rowWidth + p, p);
+                var verticalLines = new fabric.Line([xcoord, ycoord, xcoord,
+                        ycoord + (rowHeight * numRows)], {
+                stroke: "#000000",
+                strokeWidth: 0.5,
+                selectable: false
+                });
+                canvas.add(verticalLines);
+                //ctx.lineTo(0.5 + x * rowWidth + p, (rowHeight * numRows) + p);
+            }
+
+
+            for (var x = 0; x <= numRows; x++) {
+                ycoord = .5 + (x * rowHeight) + p;
+                xcoord = p;
+                var horizontalLines = new fabric.Line([xcoord, ycoord, xcoord +
+                        (rowWidth * numStitches), ycoord], {
+                stroke: "#000000",
+                strokeWidth: 0.5,
+                selectable: false
+                });
+                canvas.add(horizontalLines);
+            }
+
+            canvas.observe('selection:created', function (e)
+            {
+               e.memo.target.hasControls = false;
+            });
+
+            //canvas.observe('mouse:down', function(e) { duplicate(e); });
+
+            function duplicate() {
+
+                var selected = canvas.getActiveObject();
+                var group = canvas.getActiveGroup();
+
+                if (group) {
+                    for (var i=0;i<group.objects.length;i++) {
+                        var obj = group.objects[i];
+                        renderDuplicates(obj.type_name, obj.originalTop, obj.originalLeft);
+                    }
+                } else {
+                    renderDuplicates(selected.type_name, selected.top, selected.left);
+                }
+            }
+
+            canvas.observe({'mouse:up': function(e) {
+                var active = canvas.getActiveObject();
+                var group = canvas.getActiveGroup();
+                if (active) {
+                  var top = 0;
+                  var left = 0;
+                  if (group) {
+                        var len = group.size();
+                        for (var i = 0; i<len; i++) {
+                          var ao = group.item(i);
+                          console.log("ao.top: " + ao.top + " , ao.left: " + ao.left);
+                          var aoTop = ao.top + group.top;
+                          var aoLeft = ao.left + group.left; 
+                          console.log("group.top: " + group.top + " group.left: " + group.left);
+                          console.log("ao top and left: " + aoTop + " " +  aoLeft);
+                          var sp = findClosestSnapPoint(aoLeft, aoTop);
+                          if (sp.length == 2) {
+                          console.log(sp);
+                              var movex = (aoLeft - sp[0]);
+                              var movey = (aoTop - sp[1]);
+                              ao.set("left", (ao.left - movex));
+                              ao.set("top", (ao.top - movey));
+                          }
+                        }
+                        group.set("hasBorders", false);
+                        group.drawBorders(canvas.getContext());
+                        canvas.renderAll();
+                  } else {
+                    top = active.top;
+                    left = active.left;
+                  
+                    //console.log(active);
+                    //console.log(active.left + " " + active.top); 
+                    var snapPoint = findClosestSnapPoint(left, top);
+                    //console.log(snapPoint);
+                    if (snapPoint.length == 2) {
+                        active.set("left", snapPoint[0]);
+                        active.set("top", snapPoint[1]);
+                        canvas.renderAll();
+                    }
+                  }
+                }
+            }});
+
+            function findClosestSnapPoint(objx,objy) {
+              // arbitrarily large, so we should always get a real value 
+              var xdiff=99999;
+              var ydiff=99999;
+              var bestXcoord = 0;
+              var bestYcoord = 0;
+              //console.log("snap points: " + snapPoints);
+              for (var i=0; i<snapPoints.length; i++) {
+                  var xy = snapPoints[i];
+                  var xd = Math.abs(objx - xy[0]);
+                  //console.log ("objx = " + objx + ", index = " + i + " , xd = " + xd);
+                  var yd = Math.abs(objy - xy[1]);
+                  //console.log ("objy = " + objy + ", index = " + i + " , yd = " + yd);
+                  if (xd <= xdiff) {
+                      xdiff = xd;
+                      bestXcoord = xy[0] ;
+                  }
+                  if (yd <= ydiff) {
+                      ydiff = yd;
+                      bestYcoord = xy[1];
+                  }
+              }
+              //console.log("bestXcoord = " + bestXcoord + " , bestYcoord = " + bestYcoord);
+              xdiff = 99999;
+              ydiff = 99999;
+
+              return [bestXcoord, bestYcoord];
+            }
+
+            function renderDuplicates(obj_name, obj_top, obj_left) {
+                if (obj_name == 'Cross') {
+                    canvas.add(new Cross({top: obj_top, left: obj_left}));
+                }
+            }
+
+        </script>
+    </body>
+</html>
