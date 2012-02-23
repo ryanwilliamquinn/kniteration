@@ -11,5 +11,14 @@ GET     /favicon.ico                            404
 # Map static resources from the /app/public folder to the /public path
 GET     /public/                                staticDir:public
 
+# Load a pattern
+GET     /pattern/{id}                           Application.loadPattern
+
+# Import CRUD routes
+*       /admin                                  module:crud
+
+# Import Secure routes
+*       /                                       module:secure
+
 # Catch all
 *       /{controller}/{action}                  {controller}.{action}

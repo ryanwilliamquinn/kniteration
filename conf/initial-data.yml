@@ -1,0 +1,33 @@
+# Test data
+
+# need patterns first, since they are used by the users
+Pattern(sweater):
+    name:           sweater
+    rows:           10
+    columns:        5
+
+Pattern(scarf):
+    name:           scarf
+    rows:           20
+    columns:        10
+
+Pattern(hat):
+    name:           hat
+    rows:           5
+    columns:        3
+
+User(lauren):
+    email:          lauren@gmail.com
+    password:       secret
+    fullname:       lauren girard 
+    isAdmin:        true
+    patterns:
+                    - sweater
+                    - hat
+    
+User(ryan):
+    email:          ryan@gmail.com
+    password:       secret
+    fullname:       ryan quinn 
+    patterns:
+                    - scarf  
